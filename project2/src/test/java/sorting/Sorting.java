@@ -7,8 +7,8 @@ public class Sorting extends BaseTest {
 
     @Test
     public void testSorting() {
-        homePage.sortProduct("Name (A - Z)");
+        homePage.sortProduct("Name oogg");
         homePage.sortProduct("Price (High - Low)");
-        homePage.sortProduct("CO₂ Rating (A - E)");
+        homePage.sortProduct("CO₂ Rating");
     }
 }
