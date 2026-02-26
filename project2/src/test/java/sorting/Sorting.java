@@ -9,6 +9,6 @@ public class Sorting extends BaseTest {
     public void testSorting() {
         homePage.sortProduct("Name");
         homePage.sortProduct("Price (High - Low)");
-        homePage.sortProduct("CO₂ Rating");
+        homePage.sortProd);
     }
 }
