@@ -10,8 +10,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 
 public class HomePage {
-
-
     public WebDriver driver;
     public WebDriverWait wait;
 
@@ -19,17 +17,11 @@ public class HomePage {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
-
-
-
     private By sortField = By.cssSelector("select[class='form-select']");
 
 
     public void sortProduct(String product) {
         new Select(driver.findElement(sortField)).selectByVisibleText(product);
 
-
-    }
-
-
+}
 }
