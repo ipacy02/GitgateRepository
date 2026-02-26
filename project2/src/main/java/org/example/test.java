@@ -7,7 +7,7 @@ package org.example;
         public static void main(String[] args) {
 
             // TODO: Implement business logic
-            System.out.println("Work in progress and it is working");
+            System.out.println("Work in progress and it is working properly");
 
             // Placeholder method call
             greetUser("Developer");
