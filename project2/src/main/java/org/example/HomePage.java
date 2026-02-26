@@ -17,11 +17,10 @@ public class HomePage {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
-    private By sortField = By.cssSelector("select[class='form-select']");
-
+    private By sortField = By.cssSelector("select.form-select");
 
     public void sortProduct(String product) {
-        new Select(driver.findElement(sortField)).selectByVisibleText(product);
-
-}
+        WebElement dropdown = wait.until(ExpectedConditions.visibilityOfElementLocated(sortField));
+        new Select(dropdown).selectByVisibleText(product);
+    }
 }
