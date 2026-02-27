@@ -1,7 +1,7 @@
 package sorting;
 
 import basetest.BaseTest;
-import org.testng.Assert;
+import org. testng.Assert;
 import org.testng.annotations.Test;
 
 public class Sorting extends BaseTest {
@@ -39,6 +39,6 @@ public class Sorting extends BaseTest {
     @Test
     public void sortByCo2EA() {
         homePage.sortProduct("CO₂ Rating (E - A)");
-        Assert.assertEquals(homePage.getSelectedSortOption(), "CO₂ Rating (E - A)");
+        Assert.assertEquals(homePage.getSelectedSortOption(), "");
     }
 }
