@@ -3,12 +3,10 @@ name: Java CI Pipeline
 on:
   push:
     branches: [main, dev, ft/pipeline]
-  pull_request:
-    branches: [main, dev, ft/pipeline]
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -39,3 +37,21 @@ jobs:
         with:
           name: test-results
           path: target/surefire-reports/
+
+  auto-create-pr:
+    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Automated PR from CI"
+          branch: ${{ github.ref_name }}
+          title: "Automated PR: ${{ github.ref_name }}"
+          body: "This pull request was automatically created by the CI workflow."
+          base: main

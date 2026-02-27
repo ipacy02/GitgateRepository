@@ -39,6 +39,6 @@ public class Sorting extends BaseTest {
     @Test
     public void sortByCo2EA() {
         homePage.sortProduct("CO₂ Rating (E - A)");
-        Assert.assertEquals(homePage.getSelectedSortOption(), "");
+        Assert.assertEquals(homePage.getSelectedSortOption(), "CO₂ Rating");
     }
 }
