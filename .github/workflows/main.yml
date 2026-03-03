@@ -31,32 +31,3 @@ jobs:
         with:
           name: test-results
           path: target/surefire-reports/
-
-  auto-create-pr:
-    if: github.event_name == 'push' && github.ref != 'refs/heads/main'
-    needs: build-and-test
-    runs-on: ubuntu-latest
-
-    permissions:
-      contents: write
-      pull-requests: write
-
-    steps:
-      - name: Check if PR already exists
-        id: check_pr
-        run: |
-          PR_EXISTS=$(gh pr list --head ${{ github.ref_name }} --base main --json number --jq 'length')
-          echo "exists=$PR_EXISTS" >> $GITHUB_OUTPUT
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Pull Request
-        if: steps.check_pr.outputs.exists == '0'
-        run: |
-          gh pr create \
-            --base main \
-            --head ${{ github.ref_name }} \
-            --title "Automated PR: ${{ github.ref_name }}" \
-            --body "This pull request was automatically created by the CI pipeline."
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
