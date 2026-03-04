@@ -1,4 +1,4 @@
-name: Java CI Pipeline - Local Agent
+name: Java CI - PACCY AGENT Run
 
 trigger:
   branches:
@@ -6,75 +6,29 @@ trigger:
       - main
 
 pool:
-  name: 'Default' # This directs the job to your local Windows agent
+  name: 'Default'
+  demands:
+    - agent.name -equals PACCY AGENT
 
 steps:
   - checkout: self
-
-  # We removed the JavaToolInstaller because your agent uses the 
-  # System Java (v22) that we verified in PowerShell.
 
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
       mavenPomFile: 'project2/pom.xml'
-      # -Dtest=Sorting forces it to run your specific class
-      # -DfailIfNoTests=false prevents build failure if no other tests match
+      # -Dtest=Sorting targets your test; -DfailIfNoTests=false prevents crash if no others exist
       goals: 'clean verify -Dtest=Sorting -DfailIfNoTests=false'
       publishJUnitResults: true
-      # Using Windows-style backslashes for the results path
       testResultsFiles: 'project2\target\surefire-reports\TEST-*.xml'
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.22' # Links to your local JDK 22
+      jdkVersionOption: '1.22' # Maps to your Java 22
       mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Upload Test Results'
+    displayName: 'Upload Results'
     condition: always()
     inputs:
       PathtoPublish: 'project2\target\surefire-reports'
       ArtifactName: 'test-results'
       publishLocation: 'Container'
-
-
-
-# name: Java CI Pipeline
-
-# trigger:
-#   branches:
-#     include:
-#       - main
-#       - dev
-#       - ft/*
-
-# pool:
-#  vmImage: 'windows-latest' # Or 'windows-latest'
-
-# steps:
-#   - checkout: self
-
-#   - task: JavaToolInstaller@0
-#     inputs:
-#       versionSpec: '17'
-#       jdkArchitectureOption: 'x64'
-#       jdkSourceOption: 'PreInstalled'
-
-#   - task: Maven@4
-#     displayName: 'Build & Run Tests'
-#     inputs:
-#       mavenPomFile: 'pom.xml'
-#       goals: 'clean verify'
-#       publishJUnitResults: true
-#       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-#       javaHomeOption: 'JDKVersion'
-#       jdkVersionOption: '1.17'
-#       mavenAuthenticateFeed: false
-
-#   - task: PublishBuildArtifacts@1
-#     displayName: 'Upload Test Results'
-#     condition: always()
-#     inputs:
-#       # We use the variable here to ensure the Windows path is fully resolved
-#       PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
-#       ArtifactName: 'test-results'
-#       publishLocation: 'Container'
