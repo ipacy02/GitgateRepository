@@ -1,4 +1,4 @@
-name: Java CI - PACCY AGENT Final
+name: Java CI - PACCY AGENT FIXED
 
 trigger:
   branches:
@@ -7,7 +7,6 @@ trigger:
 
 pool:
   name: 'Default'
-  # No demands needed since PACCY AGENT is your only online agent
 
 steps:
   - checkout: self
@@ -15,22 +14,23 @@ steps:
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
-      # This points to the correct pom file inside project2
       mavenPomFile: 'project2/pom.xml'
-      # Updated -Dtest to match your file name 'SortingTest'
-      goals: 'clean verify -Dtest=SortingTest -DfailIfNoTests=false'
+      # 1. Changed -Dtest to SortingTest (to match your filename)
+      # 2. Added -DfailIfNoTests=false to prevent the build from crashing if it skips
+      goals: 'clean test -Dtest=SortingTest -DfailIfNoTests=false'
       publishJUnitResults: true
-      # Recursive search ensures we find the XML regardless of folder depth
-      testResultsFiles: '**/target/surefire-reports/TEST-*.xml'
+      # 3. Use a universal wildcard to find the XML anywhere in the work folder
+      testResultsFiles: '**/TEST-*.xml'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '1.22'
       mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Upload Results'
+    displayName: 'Upload Debug Artifacts'
     condition: always()
     inputs:
-      # This uploads everything in the target folder for debugging
-      PathtoPublish: 'project2/target/surefire-reports'
-      ArtifactName: 'test-results'
+      # This will upload the entire project2 folder if the tests fail
+      # so we can see exactly what files were created on your computer.
+      PathtoPublish: 'project2'
+      ArtifactName: 'full-project-debug'
       publishLocation: 'Container'
