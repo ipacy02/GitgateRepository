@@ -8,7 +8,7 @@ trigger:
       - ft/*
 
 pool:
-  vmImage: 'ubuntu-latest' # Using Ubuntu for better speed and reliability
+  vmImage: 'ubuntu-latest'
 
 steps:
   - checkout: self
@@ -23,22 +23,21 @@ steps:
     displayName: 'Build & Run Tests'
     inputs:
       mavenPomFile: 'pom.xml'
-      # 'verify' runs the tests; if this fails, the folder below won't exist!
-      goals: 'clean verify' 
+      # Added -Dtest=* to force Maven to look for all tests
+      goals: 'clean verify -Dtest=*' 
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '1.17'
-      mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
-    # 'always()' ensures we try to upload results even if a test fails
-    condition: always() 
+    condition: always()
     inputs:
-      # Use $(System.DefaultWorkingDirectory) for a clean Linux path
-      PathtoPublish: '$(System.DefaultWorkingDirectory)/target/surefire-reports'
-      ArtifactName: 'test-results'
+      # Changed to a wildcard search. If the folder exists ANYWHERE, it will find it.
+      PathtoPublish: '$(Build.SourcesDirectory)'
+      # We target only the surefire-reports files inside that directory
+      ArtifactName: 'test-reports-bundle'
       publishLocation: 'Container'
 
 
