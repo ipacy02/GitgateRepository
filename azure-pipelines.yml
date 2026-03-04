@@ -1,4 +1,4 @@
-name: Java CI - PACCY AGENT FIXED
+name: Java CI - PACCY AGENT SUCCESS
 
 trigger:
   branches:
@@ -6,31 +6,35 @@ trigger:
       - main
 
 pool:
-  name: 'Default'
+  name: 'Default' # Targets your local Windows agent
 
 steps:
   - checkout: self
 
   - task: Maven@4
-    displayName: 'Build & Run Tests'
+    displayName: 'Maven Test Execution'
     inputs:
+      # Points to the pom.xml inside your project2 folder
       mavenPomFile: 'project2/pom.xml'
-      # 1. Changed -Dtest to SortingTest (to match your filename)
-      # 2. Added -DfailIfNoTests=false to prevent the build from crashing if it skips
-      goals: 'clean test -Dtest=SortingTest -DfailIfNoTests=false'
+      
+      # 'clean test' ensures a fresh build and runs your TestNG tests
+      goals: 'clean test' 
+      
       publishJUnitResults: true
-      # 3. Use a universal wildcard to find the XML anywhere in the work folder
-      testResultsFiles: '**/TEST-*.xml'
+      
+      # The double asterisk (**/) tells the agent to look inside project2/target
+      # even if the folder structure is deep on Windows.
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.22'
+      jdkVersionOption: '1.22' # Maps to your local Java 22
       mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Upload Debug Artifacts'
+    displayName: 'Upload Raw Test Logs'
     condition: always()
     inputs:
-      # This will upload the entire project2 folder if the tests fail
-      # so we can see exactly what files were created on your computer.
-      PathtoPublish: 'project2'
-      ArtifactName: 'full-project-debug'
+      # If the 'Tests' tab is empty, we can download this to see the errors
+      PathtoPublish: 'project2/target/surefire-reports'
+      ArtifactName: 'surefire-raw-logs'
       publishLocation: 'Container'
