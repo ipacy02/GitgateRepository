@@ -1,4 +1,4 @@
-name: Java CI Pipeline
+name: Java CI Pipeline - Local Agent
 
 trigger:
   branches:
@@ -6,32 +6,33 @@ trigger:
       - main
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default' # This directs the job to your local Windows agent
 
 steps:
   - checkout: self
 
-  - task: JavaToolInstaller@0
-    inputs:
-      versionSpec: '22' # FIXED: Matches your pom.xml (22)
-      jdkArchitectureOption: 'x64'
-      jdkSourceOption: 'PreInstalled'
+  # We removed the JavaToolInstaller because your agent uses the 
+  # System Java (v22) that we verified in PowerShell.
 
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
       mavenPomFile: 'project2/pom.xml'
-      # -Dtest=Sorting forces Maven to find your file even though it's not named 'SortingTest'
-      # -DfailIfNoTests=false prevents the crash if it can't find others
+      # -Dtest=Sorting forces it to run your specific class
+      # -DfailIfNoTests=false prevents build failure if no other tests match
       goals: 'clean verify -Dtest=Sorting -DfailIfNoTests=false'
       publishJUnitResults: true
-      testResultsFiles: '**/project2/target/surefire-reports/TEST-*.xml'
+      # Using Windows-style backslashes for the results path
+      testResultsFiles: 'project2\target\surefire-reports\TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.22' # Links to your local JDK 22
+      mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
     condition: always()
     inputs:
-      PathtoPublish: 'project2/target/surefire-reports'
+      PathtoPublish: 'project2\target\surefire-reports'
       ArtifactName: 'test-results'
       publishLocation: 'Container'
 
