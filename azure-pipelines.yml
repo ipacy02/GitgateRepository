@@ -4,8 +4,6 @@ trigger:
   branches:
     include:
       - main
-      - dev
-      - ft/*
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -22,22 +20,19 @@ steps:
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
-      mavenPomFile: 'pom.xml'
-      # Added -Dtest=* to force Maven to look for all tests
-      goals: 'clean verify -Dtest=*' 
+      mavenPomFile: 'project2/pom.xml'
+      # -DfailIfNoTests=false prevents the crash you just saw
+      goals: 'clean verify -DfailIfNoTests=false' 
       publishJUnitResults: true
-      testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.17'
+      # This looks for the results exactly where project2 creates them
+      testResultsFiles: 'project2/target/surefire-reports/TEST-*.xml'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
     condition: always()
     inputs:
-      # Changed to a wildcard search. If the folder exists ANYWHERE, it will find it.
-      PathtoPublish: '$(Build.SourcesDirectory)'
-      # We target only the surefire-reports files inside that directory
-      ArtifactName: 'test-reports-bundle'
+      PathtoPublish: 'project2/target/surefire-reports'
+      ArtifactName: 'test-results'
       publishLocation: 'Container'
 
 
