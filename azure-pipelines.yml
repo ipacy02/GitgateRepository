@@ -1,42 +1,79 @@
-
-
 name: Java CI Pipeline
 
 trigger:
   branches:
     include:
       - main
-      - dev
-      - ft/*
 
 pool:
- vmImage: 'windows-latest' # Or 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
   - checkout: self
 
   - task: JavaToolInstaller@0
     inputs:
-      versionSpec: '17'
+      versionSpec: '22' # FIXED: Matches your pom.xml (22)
       jdkArchitectureOption: 'x64'
       jdkSourceOption: 'PreInstalled'
 
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
-      mavenPomFile: 'pom.xml'
-      goals: 'clean verify'
+      mavenPomFile: 'project2/pom.xml'
+      # -Dtest=Sorting forces Maven to find your file even though it's not named 'SortingTest'
+      # -DfailIfNoTests=false prevents the crash if it can't find others
+      goals: 'clean verify -Dtest=Sorting -DfailIfNoTests=false'
       publishJUnitResults: true
-      testResultsFiles: '**/surefire-reports/TEST-*.xml'
-      javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.17'
-      mavenAuthenticateFeed: false
+      testResultsFiles: '**/project2/target/surefire-reports/TEST-*.xml'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
     condition: always()
     inputs:
-      # We use the variable here to ensure the Windows path is fully resolved
-      PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
+      PathtoPublish: 'project2/target/surefire-reports'
       ArtifactName: 'test-results'
       publishLocation: 'Container'
+
+
+
+# name: Java CI Pipeline
+
+# trigger:
+#   branches:
+#     include:
+#       - main
+#       - dev
+#       - ft/*
+
+# pool:
+#  vmImage: 'windows-latest' # Or 'windows-latest'
+
+# steps:
+#   - checkout: self
+
+#   - task: JavaToolInstaller@0
+#     inputs:
+#       versionSpec: '17'
+#       jdkArchitectureOption: 'x64'
+#       jdkSourceOption: 'PreInstalled'
+
+#   - task: Maven@4
+#     displayName: 'Build & Run Tests'
+#     inputs:
+#       mavenPomFile: 'pom.xml'
+#       goals: 'clean verify'
+#       publishJUnitResults: true
+#       testResultsFiles: '**/surefire-reports/TEST-*.xml'
+#       javaHomeOption: 'JDKVersion'
+#       jdkVersionOption: '1.17'
+#       mavenAuthenticateFeed: false
+
+#   - task: PublishBuildArtifacts@1
+#     displayName: 'Upload Test Results'
+#     condition: always()
+#     inputs:
+#       # We use the variable here to ensure the Windows path is fully resolved
+#       PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
+#       ArtifactName: 'test-results'
+#       publishLocation: 'Container'
