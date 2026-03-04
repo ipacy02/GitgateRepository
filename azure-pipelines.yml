@@ -8,7 +8,7 @@ trigger:
       - ft/*
 
 pool:
- vmImage: 'ubuntu-latest' # Or 'windows-latest'
+ vmImage: 'windows-lates' # Or 'windows-latest'
 
 steps:
   - checkout: self
