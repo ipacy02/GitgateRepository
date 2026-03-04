@@ -8,7 +8,7 @@ trigger:
       - ft/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'Default'
 
 steps:
   # Checkout is implicit in Azure Pipelines, but added here for clarity
