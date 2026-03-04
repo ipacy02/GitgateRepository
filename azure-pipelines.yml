@@ -8,10 +8,9 @@ trigger:
       - ft/*
 
 pool:
-  name: 'Default'
+  name: 'Default' # This correctly targets PACCY AGENT
 
 steps:
-  # Checkout is implicit in Azure Pipelines, but added here for clarity
   - checkout: self
 
   - task: JavaToolInstaller@0
@@ -30,13 +29,12 @@ steps:
       javaHomeOption: 'JDKVersion'
       jdkVersionOption: '1.17'
       mavenAuthenticateFeed: false
-      effectivePomSkip: false
-      sonarQubeRunAnalysis: false
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
     condition: always()
     inputs:
-      PathtoPublish: 'target/surefire-reports/'
+      # We use the variable here to ensure the Windows path is fully resolved
+      PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
       ArtifactName: 'test-results'
       publishLocation: 'Container'
