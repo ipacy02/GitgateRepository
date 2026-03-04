@@ -1,4 +1,4 @@
-name: Java CI - PACCY AGENT Run
+name: Java CI Pipeline - PACCY AGENT
 
 trigger:
   branches:
@@ -17,16 +17,17 @@ steps:
     displayName: 'Build & Run Tests'
     inputs:
       mavenPomFile: 'project2/pom.xml'
-      # -Dtest=Sorting targets your test; -DfailIfNoTests=false prevents crash if no others exist
+      # -Dtest=Sorting targets your file; -DfailIfNoTests=false prevents empty-match crashes
       goals: 'clean verify -Dtest=Sorting -DfailIfNoTests=false'
       publishJUnitResults: true
+      # Windows agents use backslashes for file paths
       testResultsFiles: 'project2\target\surefire-reports\TEST-*.xml'
       javaHomeOption: 'JDKVersion'
-      jdkVersionOption: '1.22' # Maps to your Java 22
+      jdkVersionOption: '1.22'  # This correctly maps to your local Java 22
       mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Upload Results'
+    displayName: 'Upload Test Results'
     condition: always()
     inputs:
       PathtoPublish: 'project2\target\surefire-reports'
