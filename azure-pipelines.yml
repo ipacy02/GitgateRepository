@@ -1,12 +1,16 @@
+
+
 name: Java CI Pipeline
 
 trigger:
   branches:
     include:
       - main
+      - dev
+      - ft/*
 
 pool:
-  vmImage: 'ubuntu-latest'
+ vmImage: 'windows-latest' # Or 'windows-latest'
 
 steps:
   - checkout: self
@@ -20,59 +24,19 @@ steps:
   - task: Maven@4
     displayName: 'Build & Run Tests'
     inputs:
-      mavenPomFile: 'project2/pom.xml'
-      # -DfailIfNoTests=false prevents the crash you just saw
-      goals: 'clean verify -DfailIfNoTests=false' 
+      mavenPomFile: 'pom.xml'
+      goals: 'clean verify'
       publishJUnitResults: true
-      # This looks for the results exactly where project2 creates them
-      testResultsFiles: 'project2/target/surefire-reports/TEST-*.xml'
+      testResultsFiles: '**/surefire-reports/TEST-*.xml'
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.17'
+      mavenAuthenticateFeed: false
 
   - task: PublishBuildArtifacts@1
     displayName: 'Upload Test Results'
     condition: always()
     inputs:
-      PathtoPublish: 'project2/target/surefire-reports'
+      # We use the variable here to ensure the Windows path is fully resolved
+      PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
       ArtifactName: 'test-results'
       publishLocation: 'Container'
-
-
-# name: Java CI Pipeline
-
-# trigger:
-#   branches:
-#     include:
-#       - main
-#       - dev
-#       - ft/*
-
-# pool:
-#  vmImage: 'windows-latest' # Or 'windows-latest'
-
-# steps:
-#   - checkout: self
-
-#   - task: JavaToolInstaller@0
-#     inputs:
-#       versionSpec: '17'
-#       jdkArchitectureOption: 'x64'
-#       jdkSourceOption: 'PreInstalled'
-
-#   - task: Maven@4
-#     displayName: 'Build & Run Tests'
-#     inputs:
-#       mavenPomFile: 'pom.xml'
-#       goals: 'clean verify'
-#       publishJUnitResults: true
-#       testResultsFiles: '**/surefire-reports/TEST-*.xml'
-#       javaHomeOption: 'JDKVersion'
-#       jdkVersionOption: '1.17'
-#       mavenAuthenticateFeed: false
-
-#   - task: PublishBuildArtifacts@1
-#     displayName: 'Upload Test Results'
-#     condition: always()
-#     inputs:
-#       # We use the variable here to ensure the Windows path is fully resolved
-#       PathtoPublish: '$(Build.SourcesDirectory)/target/surefire-reports/'
-#       ArtifactName: 'test-results'
-#       publishLocation: 'Container'
